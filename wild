@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wild West Gold - Slot Game</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background-color: #333; color: #fff; }
+    #reels { display: flex; justify-content: center; margin: 20px; }
+    .reel { border: 2px solid #aaa; padding: 20px; margin: 5px; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 20px; background-color: #555; color: #fff; }
+    #controls { margin-top: 20px; }
+    button { padding: 10px 20px; font-size: 16px; margin: 5px; }
+    input { padding: 10px; font-size: 16px; width: 100px; margin: 5px; text-align: center; }
+    #balance { font-size: 18px; margin-bottom: 10px; }
+    #result { font-size: 20px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Wild West Gold - Slot Game</h1>
+  <p id="balance">Balance: $100</p>
+  <div id="reels">
+    <div class="reel" id="reel1">-</div>
+    <div class="reel" id="reel2">-</div>
+    <div class="reel" id="reel3">-</div>
+  </div>
+  <div id="controls">
+    <input type="number" id="bet" placeholder="Bet Amount" min="1" />
+    <button onclick="spin()">Spin</button>
+    <p id="result"></p>
+  </div>
+
+  <script>
+    const symbols = ["Gold", "Sheriff", "Horse", "Gun", "Wild"];
+    const payoutTable = {
+      "Gold": 5,
+      "Sheriff": 3,
+      "Horse": 2,
+      "Gun": 1,
+      "Wild": 10
+    };
+
+    let balance = 100;
+
+    function spinReel() {
+      return symbols[Math.floor(Math.random() * symbols.length)];
+    }
+
+    function spin() {
+      const betInput = document.getElementById("bet");
+      const betAmount = parseFloat(betInput.value);
+
+      if (isNaN(betAmount) || betAmount <= 0) {
+        document.getElementById("result").textContent = "Please enter a valid bet amount!";
+        return;
+      }
+
+      if (betAmount > balance) {
+        document.getElementById("result").textContent = "Insufficient balance!";
+        return;
+      }
+
+      // Deduct bet amount from balance
+      balance -= betAmount;
+
+      const reel1 = spinReel();
+      const reel2 = spinReel();
+      const reel3 = spinReel();
+
+      document.getElementById("reel1").textContent = reel1;
+      document.getElementById("reel2").textContent = reel2;
+      document.getElementById("reel3").textContent = reel3;
+
+      calculatePayout([reel1, reel2, reel3], betAmount);
+    }
+
+    function calculatePayout(reels, betAmount) {
+      const [r1, r2, r3] = reels;
+      let result = "";
+
+      if (r1 === r2 && r2 === r3) {
+        const winnings = betAmount * payoutTable[r1];
+        balance += winnings;
+        result = `You win! ${payoutTable[r1]}x your bet. Winnings: $${winnings.toFixed(2)}`;
+      } else {
+        result = "No win. Try again!";
+      }
+
+      // Update balance and result
+      document.getElementById("balance").textContent = `Balance: $${balance.toFixed(2)}`;
+      document.getElementById("result").textContent = result;
+    }
+  </script>
+</body>
+</html>
