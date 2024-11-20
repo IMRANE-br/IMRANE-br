@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة إطلاق الكرات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #333;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            display: block;
+            margin: 20px auto;
+            background-color: black;
+            border: 2px solid white;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>لعبة إطلاق الكرات</h1>
+    <p>حرك المدفع باستخدام الأسهم اليسرى واليمنى، وأطلق الكرات باستخدام المسافة!</p>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    <button onclick="restartGame()">إعادة اللعب</button>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // خصائص المدفع
+        const shooter = {
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 50,
+            width: 50,
+            height: 20,
+            color: 'blue',
+            speed: 5,
+            dx: 0
+        };
+
+        // مصفوفة الكرات
+        const balls = [];
+
+        // الكتل
+        const blocks = [];
+        const blockWidth = 50;
+        const blockHeight = 20;
+        const blockColors = ['red', 'yellow', 'green', 'orange'];
+
+        let isGameOver = false;
+
+        // إنشاء الكتل
+        function createBlocks() {
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 8; j++) {
+                    blocks.push({
+                        x: j * (blockWidth + 10) + 15,
+                        y: i * (blockHeight + 10) + 10,
+                        width: blockWidth,
+                        height: blockHeight,
+                        color: blockColors[Math.floor(Math.random() * blockColors.length)]
+                    });
+                }
+            }
+        }
+
+        // رسم المدفع
+        function drawShooter() {
+            ctx.fillStyle = shooter.color;
+            ctx.fillRect(shooter.x, shooter.y, shooter.width, shooter.height);
+        }
+
+        // رسم الكرات
+        function drawBalls() {
+            balls.forEach((ball, index) => {
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fillStyle = ball.color;
+                ctx.fill();
+                ctx.closePath();
+
+                // تحديث موقع الكرة
+                ball.y -= ball.speed;
+
+                // إزالة الكرة إذا خرجت من الشاشة
+                if (ball.y + ball.radius < 0) {
+                    balls.splice(index, 1);
+                }
+            });
+        }
+
+        // رسم الكتل
+        function drawBlocks() {
+            blocks.forEach((block, index) => {
+                ctx.fillStyle = block.color;
+                ctx.fillRect(block.x, block.y, block.width, block.height);
+
+                // التحقق من التصادم مع الكرات
+                balls.forEach((ball, ballIndex) => {
+                    if (
+                        ball.x + ball.radius > block.x &&
+                        ball.x - ball.radius < block.x + block.width &&
+                        ball.y + ball.radius > block.y &&
+                        ball.y - ball.radius < block.y + block.height
+                    ) {
+                        // إزالة الكرة والكتلة
+                        balls.splice(ballIndex, 1);
+                        blocks.splice(index, 1);
+                    }
+                });
+            });
+        }
+
+        // تحديث موقع المدفع
+        function moveShooter() {
+            shooter.x += shooter.dx;
+
+            // منع المدفع من الخروج من الحدود
+            if (shooter.x < 0) {
+                shooter.x = 0;
+            } else if (shooter.x + shooter.width > canvas.width) {
+                shooter.x = canvas.width - shooter.width;
+            }
+        }
+
+        // رسم كل العناصر
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawShooter();
+            drawBalls();
+            drawBlocks();
+        }
+
+        // تحديث اللعبة
+        function update() {
+            if (!isGameOver) {
+                moveShooter();
+                draw();
+
+                // التحقق من نهاية اللعبة
+                blocks.forEach((block) => {
+                    if (block.y + block.height >= canvas.height) {
+                        isGameOver = true;
+                        alert('انتهت اللعبة! حاول مرة أخرى.');
+                    }
+                });
+
+                requestAnimationFrame(update);
+            }
+        }
+
+        // إطلاق الكرة
+        function shootBall() {
+            balls.push({
+                x: shooter.x + shooter.width / 2,
+                y: shooter.y,
+                radius: 5,
+                color: 'white',
+                speed: 7
+            });
+        }
+
+        // إعادة تشغيل اللعبة
+        function restartGame() {
+            isGameOver = false;
+            blocks.length = 0;
+            balls.length = 0;
+            shooter.x = canvas.width / 2 - 25;
+            createBlocks();
+            update();
+        }
+
+        // التحكم بلوحة المفاتيح
+        function handleKeyDown(event) {
+            if (event.key === 'ArrowLeft') {
+                shooter.dx = -shooter.speed;
+            } else if (event.key === 'ArrowRight') {
+                shooter.dx = shooter.speed;
+            } else if (event.key === ' ') {
+                shootBall();
+            }
+        }
+
+        function handleKeyUp(event) {
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                shooter.dx = 0;
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        createBlocks();
+        update();
+    </script>
+
+</body>
+</html>
