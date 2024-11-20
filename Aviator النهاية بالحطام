@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviator Game (نقطة تحطم مخفية)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f0f0; /* خلفية الصفحة رمادية */
+        }
+        #game-log {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #d3d3d3; /* خلفية خلية اللعبة باللون الرمادي */
+            text-align: left;
+            max-width: 600px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        input {
+            padding: 5px 10px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>لعبة Aviator (نقطة تحطم مخفية)</h1>
+    <div>
+        <p>رصيدك الحالي: <span id="balance">100</span>$</p>
+        <input type="number" id="bet" placeholder="أدخل قيمة رهانك" />
+        <button onclick="startGame()">ابدأ اللعبة</button>
+    </div>
+    <div id="game-log"></div>
+    <script>
+        let balance = 100; // الرصيد الحالي
+        let flying = false; // حالة الطائرة
+        let crashPoint = 0; // نقطة التحطم المخفية
+
+        function logMessage(message) {
+            // إضافة رسالة إلى سجل اللعبة
+            const logDiv = document.getElementById("game-log");
+            const newLog = document.createElement("p");
+            newLog.textContent = message;
+            logDiv.appendChild(newLog);
+            logDiv.scrollTop = logDiv.scrollHeight; // عرض النص الجديد مباشرة
+        }
+
+        function startGame() {
+            if (flying) {
+                alert("اللعبة قيد التشغيل بالفعل!");
+                return;
+            }
+
+            const betInput = document.getElementById("bet");
+            const bet = parseFloat(betInput.value);
+
+            if (isNaN(bet) || bet <= 0 || bet > balance) {
+                alert("الرهان غير صالح. حاول مجددًا.");
+                return;
+            }
+
+            flying = true; // تشغيل الطائرة
+            crashPoint = Math.random() * (10 - 1.01) + 1.01; // توليد نقطة تحطم عشوائية بين 1.01 و10.0
+            logMessage("🚀 الطائرة أقلعت!");
+            betInput.value = ""; // مسح الحقل بعد إدخال الرهان
+
+            let currentMultiplier = 1.0;
+            const interval = setInterval(() => {
+                currentMultiplier += 0.1; // زيادة المضاعف
+                logMessage(`الطائرة الآن عند: ${currentMultiplier.toFixed(2)}x`);
+
+                if (currentMultiplier >= crashPoint) {
+                    // تحطم الطائرة بشكل مفاجئ عند الوصول إلى النقطة المخفية
+                    clearInterval(interval);
+                    logMessage(`💥 الطائرة تحطمت!`);
+                    balance -= bet;
+                    document.getElementById("balance").textContent = balance;
+                    if (balance <= 0) {
+                        alert("رصيدك انتهى. حظاً أوفر!");
+                    }
+                    return;
+                }
+
+                // إذا أراد اللاعب الانسحاب
+                const cashout = confirm("هل ترغب بالانسحاب؟");
+                if (cashout) {
+                    clearInterval(interval);
+                    const winnings = (bet * currentMultiplier).toFixed(2);
+                    balance += parseFloat(winnings) - bet;
+                    logMessage(`✅ انسحبت بنجاح! أرباحك: ${winnings}$`);
+                    document.getElementById("balance").textContent = balance;
+                    return;
+                }
+            }, 200); // التحديث كل 200 مللي ثانية
+        }
+    </script>
+</body>
+</html>
+
