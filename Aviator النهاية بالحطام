@@ -33,7 +33,7 @@
     </style>
 </head>
 <body>
-    <h1>لعبة Aviator (نقطة تحطم مخفية)</h1>
+    <h1 style="color: brown;">Game Aviator</h1>
     <div>
         <p>رصيدك الحالي: <span id="balance">100</span>$</p>
         <input type="number" id="bet" placeholder="أدخل قيمة رهانك" />
