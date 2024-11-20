@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
-            background-color: #f0f0f0; /* خلفية رمادية */
+            background-color: #f0f0f0; /* خلفية الصفحة رمادية */
         }
         #game-log {
             max-height: 300px;
@@ -17,7 +17,7 @@
             margin: 10px auto;
             padding: 10px;
             border: 1px solid #ccc;
-            background-color: #fff;
+            background-color: #d3d3d3; /* خلفية خلية اللعبة باللون الرمادي */
             text-align: left;
             max-width: 600px;
         }
@@ -40,6 +40,7 @@
         <button onclick="startGame()">ابدأ اللعبة</button>
     </div>
     <div id="game-log"></div>
+
     <script>
         let balance = 100; // الرصيد الحالي
         let flying = false; // حالة الطائرة
@@ -52,6 +53,12 @@
             newLog.textContent = message;
             logDiv.appendChild(newLog);
             logDiv.scrollTop = logDiv.scrollHeight; // عرض النص الجديد مباشرة
+        }
+
+        function resetGame() {
+            // إعادة تهيئة اللعبة بعد الانسحاب أو التحطم
+            flying = false;
+            crashPoint = 0;
         }
 
         function startGame() {
@@ -87,6 +94,7 @@
                     if (balance <= 0) {
                         alert("رصيدك انتهى. حظاً أوفر!");
                     }
+                    resetGame(); // إعادة تهيئة اللعبة بعد التحطم
                     return;
                 }
 
@@ -98,6 +106,7 @@
                     balance += parseFloat(winnings) - bet;
                     logMessage(`✅ انسحبت بنجاح! أرباحك: ${winnings}$`);
                     document.getElementById("balance").textContent = balance;
+                    resetGame(); // إعادة تهيئة اللعبة بعد الانسحاب
                     return;
                 }
             }, 200); // التحديث كل 200 مللي ثانية
@@ -105,3 +114,4 @@
     </script>
 </body>
 </html>
+
