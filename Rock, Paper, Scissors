@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة حجر، ورقة، مقص</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 50px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .options {
+            margin-top: 20px;
+        }
+
+        .option {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 5px;
+            background-color: #e7e7e7;
+        }
+
+        .option:hover {
+            background-color: #ddd;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>لعبة حجر، ورقة، مقص</h1>
+    <p>اختر واحدًا: حجر، ورقة، أو مقص!</p>
+
+    <div class="options">
+        <div class="option" onclick="playGame('rock')">حجر</div>
+        <div class="option" onclick="playGame('paper')">ورقة</div>
+        <div class="option" onclick="playGame('scissors')">مقص</div>
+    </div>
+
+    <div id="result"></div>
+    <button onclick="restartGame()">إعادة اللعب</button>
+
+    <script>
+        const options = ['rock', 'paper', 'scissors'];
+
+        function playGame(userChoice) {
+            const computerChoice = options[Math.floor(Math.random() * 3)];
+            let result = '';
+
+            // تحديد الفائز
+            if (userChoice === computerChoice) {
+                result = `التعادل! اخترت ${userChoice} والكمبيوتر اختار ${computerChoice}.`;
+            } else if (
+                (userChoice === 'rock' && computerChoice === 'scissors') ||
+                (userChoice === 'paper' && computerChoice === 'rock') ||
+                (userChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                result = `أنت فزت! اخترت ${userChoice} والكمبيوتر اختار ${computerChoice}.`;
+            } else {
+                result = `الكمبيوتر فاز! اخترت ${userChoice} والكمبيوتر اختار ${computerChoice}.`;
+            }
+
+            document.getElementById('result').innerText = result;
+        }
+
+        function restartGame() {
+            document.getElementById('result').innerText = '';
+        }
+    </script>
+
+</body>
+</html>
